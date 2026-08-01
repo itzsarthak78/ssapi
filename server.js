@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -23,13 +25,41 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
+// API KEY Middleware
+app.use((req, res, next) => {
+
+  if (req.path === "/" || req.path === "/health") {
+    return next();
+  }
+
+  const apiKey = req.headers["x-api-key"];
+
+  if (!apiKey) {
+    return res.status(401).json({
+      success: false,
+      message: "API key missing."
+    });
+  }
+
+  if (apiKey !== process.env.API_KEY) {
+    return res.status(403).json({
+      success: false,
+      message: "Invalid API key."
+    });
+  }
+
+  next();
+});
+
 const PORT = process.env.PORT || 3000;
 
+// Home
 app.get("/", (req, res) => {
   res.json({
     success: true,
     name: "Sarthak Screenshot API",
-    version: "1.0.0",
+    version: "2.0.0",
+    author: "Sarthak",
     endpoints: {
       home: "GET /",
       health: "GET /health",
@@ -38,6 +68,7 @@ app.get("/", (req, res) => {
   });
 });
 
+// Health
 app.get("/health", (req, res) => {
   res.json({
     success: true,
@@ -48,7 +79,9 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Screenshot Route
 app.post("/api/screenshot", async (req, res) => {
+
   const {
     url,
     width = 1366,
@@ -74,6 +107,7 @@ app.post("/api/screenshot", async (req, res) => {
   let browser;
 
   try {
+
     browser = await chromium.launch({
       headless: true
     });
@@ -109,7 +143,7 @@ app.post("/api/screenshot", async (req, res) => {
     if (browser) {
       try {
         await browser.close();
-      } catch {}
+      } catch (e) {}
     }
 
     console.error(error);
@@ -122,6 +156,7 @@ app.post("/api/screenshot", async (req, res) => {
   }
 });
 
+// 404 Handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -129,6 +164,24 @@ app.use((req, res) => {
   });
 });
 
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(500).json({
+    success: false,
+    message: "Internal Server Error"
+  });
+});
+
 app.listen(PORT, () => {
-  console.log(`🚀 Screenshot API running on port ${PORT}`);
+  console.log(`
+==========================================
+🚀 Sarthak Screenshot API Started
+==========================================
+Server : http://localhost:${PORT}
+Health : /health
+API    : /api/screenshot
+==========================================
+`);
 });
