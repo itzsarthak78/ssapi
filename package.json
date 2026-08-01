@@ -1,19 +1,24 @@
 {
-  "name": "screenshot-api",
+  "name": "sarthak-screenshot-api",
   "version": "1.0.0",
-  "description": "Screenshot API using Express and Playwright",
+  "description": "Fast Screenshot API using Express and Playwright",
+  "private": true,
+  "license": "MIT",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
-  },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "helmet": "^8.0.0",
-    "playwright": "^1.55.0"
+    "dev": "node --watch server.js"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0",
+    "compression": "^1.8.0",
+    "express-rate-limit": "^7.5.0",
+    "playwright": "^1.55.0"
   }
 }
