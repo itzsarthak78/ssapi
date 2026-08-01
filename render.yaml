@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: sarthak-screenshot-api
+    runtime: docker
+    plan: free
+    autoDeploy: true
